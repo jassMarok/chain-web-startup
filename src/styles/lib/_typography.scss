@@ -1,0 +1,49 @@
+/**
+ * Typography
+ * =================================
+ * - Base
+ * - Paragraphs
+ * - Headings
+ * - Type sizes
+ * - Misc
+ * - Utilities
+ *
+ * Body font size, leadings etc have been set in _variables.scss
+ *
+ * See http://modularscale.com for
+ *     https://archetypeapp.com/#
+ */
+
+ /*
+ * Variables
+ */
+ $font-size-base : 16px;
+
+
+/**
+* Font Family
+*/
+$base-font-family: Helvetica, Arial, sans-serif;
+$alt-font-family : Georgia,sans-serif;
+
+/**
+* Font Weights
+*/
+$light: 300;
+$normal: 400;
+$semibold: 500;
+$bold: 700;
+
+/**
+* Headings
+*/
+$font-family-headings     : $base-font-family; // using inherit will use $font-family-base for all headings
+$font-weight-headings     : bold;  // instead of browser default, bold
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6{
+    font-family: $font-family-headings;
+    font-weight: $font-weight-headings;
+}
+
+

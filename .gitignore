@@ -1,0 +1,4 @@
+## Keep Ignore file updated
+
+#Ignore All Node Modules
+node_modules

@@ -1,0 +1,38 @@
+/*
+* This file loads all partials only 
+* Load Generators, Base and then any specific styles
+* 
+* !*! Avoid any styles on this file
+*
+* +++ Provide structural comments 
+*/
+
+/*
+* Library
+*/
+@import "./lib/reset";
+@import "./lib/utilities";
+@import "./lib/colors";
+@import "./lib/breakpoints";
+@import "./lib/typography";
+@import "./lib/grid";
+
+/*
+* Commons
+*/
+@import "./common/base";
+@import "./common/wrapper";
+
+/*
+* Components
+*/
+@import "./components/navigation";
+@import "./components/buttons";
+@import "./components/heros";
+@import "./components/forms";
+@import "./components/footer";
+
+/*
+* Layout
+*/
+
