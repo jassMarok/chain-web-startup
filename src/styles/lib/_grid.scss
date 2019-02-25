@@ -1,3 +1,58 @@
 /**
-* 12 Column Grid Generated
+* 12 Column Grid Generator
+* Grid Based on -> https://github.com/devlint/gridlex / http://gridlex.devlint.fr/#documentation
+* 
 */
+
+$grid-col-count : 12 !default;;
+
+$grid-gutter : 1.5rem !default;;
+$grid-half-gutter-width: calc($grid-gutter * 0.5);
+$grid-gutter-vertical: 1.5rem !default;;
+
+$grid-mn-width : 'min-width' !default;
+$grid-mn-list: (        //NOTE: Update this if base media queries are changed
+    mobile  : 48rem,
+    tablet  : 64rem,
+    desktop : 80rem
+) !default;
+
+
+/**
+* Grid Base Line Preprocessor
+*/
+
+$grid-col-unit : (100%/$grid-column-count); //Calculate one col in %
+
+//Portion Store 
+$grid-col-portions : (
+    0 : 0
+);
+
+@for $i from 1 through $grid-col-count {
+    $grid-col-portions : map-merge($grid-col-portions, ($i : ($grid-col-unit*$i)) ); //Create Portion Store Array
+}
+
+//Fraction Store
+$grid-col-fractions : (
+    0 : 0 
+);
+
+@for $i from 1 through $grid-col-count {
+    $fraction : 1/$i;
+    $grid-col-fractions : map-merge($grid-col-fractions , ($fraction : $fraction * 100%) ); //Create Fraction Store Array
+}
+
+
+/**
+* Grid Mixin/Grid Worker
+*
+*/
+
+
+
+
+
+
+
+
