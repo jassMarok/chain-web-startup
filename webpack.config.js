@@ -8,16 +8,17 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebPackPlugin = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 let environment = 'development';
 
 /**Adjust These to match your computer ipv4*/
-const networkIP = '192.168.100.128';
-const networkPort = '9000';
+const networkIP = '192.168.100.99';
+const networkPort = '8100';
 
 module.exports = env => {
 
-    (typeof env.production == 'undefined') ? environment = 'development': environment = 'production';
+    (typeof env == 'undefined') ? environment = 'development': environment = 'production';
 
     return {
         mode: environment,
@@ -34,7 +35,13 @@ module.exports = env => {
             new CleanWebPackPlugin(['dist']),
             new HtmlWebpackPlugin({
                 title: 'Chain Frontend Framework'
-            })
+            }),
+            new MiniCssExtractPlugin({
+                // Options similar to the same options in webpackOptions.output
+                // both options are optional
+                filename: "[name].css",
+                chunkFilename: "[id].css"
+              })
         ],
         output: {
             filename: '[name].bundle.js',
@@ -50,10 +57,11 @@ module.exports = env => {
                             presets: ['@babel/preset-env']
                         }
                     }
-                }, {
+                },
+                {
                     test: /\.scss$/,
                     use: [{
-                            loader: 'style-loader'
+                            loader: environment !== 'production' ? 'style-loader' : MiniCssExtractPlugin.loader
                         },
                         {
                             loader: 'css-loader',

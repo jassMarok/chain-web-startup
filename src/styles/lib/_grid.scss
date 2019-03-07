@@ -4,17 +4,24 @@
 * 
 */
 
-$grid-col-count : 12 !default;;
+$grid-col-count : 12 !default;
+$grid-name : 'grid';
+$grid-attribute-name : 'class' !default;
+$grid-col-name : 'col' !default;
 
-$grid-gutter : 1.5rem !default;;
-$grid-half-gutter-width: calc($grid-gutter * 0.5);
-$grid-gutter-vertical: 1.5rem !default;;
+$grid-gutter : 1.5rem !default;
+$grid-half-gutter-width: calc(#{$grid-gutter} * 0.5);
+$grid-gutter-vertical: 1.5rem !default;
 
 $grid-mn-width : 'min-width' !default;
-$grid-mn-list: (        //NOTE: Update this if base media queries are changed
-    mobile  : 48rem,
-    tablet  : 64rem,
-    desktop : 80rem
+
+//TODO: Consolidate this with application media manager ? Maybe : MaybeNot 
+$grid-mq-list: (           //NOTE: Update this if base media queries are changed
+    lg-mobile  : 32.5rem,  //520px                    
+    pt-tablet  : 48rem,  //768px
+    ls-tablet  : 64rem, //1068px
+    desktop : 80rem,   //1200px
+    lg-desktop: 90rem,//1440px
 ) !default;
 
 
@@ -22,7 +29,7 @@ $grid-mn-list: (        //NOTE: Update this if base media queries are changed
 * Grid Base Line Preprocessor
 */
 
-$grid-col-unit : (100%/$grid-column-count); //Calculate one col in %
+$grid-col-unit : (100%/$grid-col-count); //Calculate one col in %
 
 //Portion Store 
 $grid-col-portions : (
@@ -49,10 +56,262 @@ $grid-col-fractions : (
 *
 */
 
+//Generate Grid Breakpoints
+@mixin bp($breakpoint) {
+    $query : map-get($grid-mq-list , $breakpoint );
+
+    @if($query != null) {
+        @media ($grid-mn-width : #{nth($query, 1)}) {
+            @content;
+        }
+    }
+}
+
+//Generate Grid by number
+@mixin makeGridByNumber($grid) {
+    @for $i from 1 through $grid-col-count {
+        [#{$grid-attribute-name}*="#{$grid}-#{i}"] > [#{$grid-attribute-name}~=#{$grid-col-name}],
+        [#{$grid-attribute-name}*="#{$grid}-#{i}"] > [#{$grid-attribute-name}*=#{$grid-col-name}-],
+        [#{$grid-attribute-name}*="#{$grid}-#{i}"] > [#{$grid-attribute-name}~=#{$grid-col-name}_] {
+            
+            $fraction : 1/$i;
+            $value : map-get($grid-col-fractions, $fraction );
+
+            flex-basis: $value;
+            max-width: $value;
+        }
+    }
+}
+
+//Generate Grid by columns
+@mixin makeCol($col) {
+    [#{$grid-attribute-name} ~= "#{$grid-name}"],
+    [#{$grid-attribute-name} *= "#{$grid-name}-"],
+    [#{$grid-attribute-name} *= "#{$grid-name}_"] {
+
+        @for $i from 1 through $grid-col-count {
+            > [#{$grid-attribute-name}*="#{$col}-#{$i}"]{
+                $value : map-get($grid-col-portions , $i );
+
+                flex-basis: $value;
+                max-width: $value;
+
+            }
+        }
+    }
+}
+
+//Generate Grid Offset Classes
+@mixin makeOffSet($off) {
+    [#{$grid-attribute-name}~="#{$grid-name}"], 
+    [#{$grid-attribute-name}*="#{$grid-name}-"],
+    [#{$grid-attribute-name}~="#{$grid-name}_"] {
+        @for $i from 0 through $grid-col-count {
+            > [data-push-left*="#{$off}-#{$i}"] {
+                margin-left: map-get($grid-col-portions, $i );
+            }
+        }
+    }
+
+    [#{$grid-attribute-name}~="#{$grid-name}"], 
+    [#{$grid-attribute-name}*="#{$grid-name}-"],
+    [#{$grid-attribute-name}~="#{$grid-name}_"] {
+        @for $i from 0 through $grid-col-count {
+            > [data-push-right*="#{$off}-#{$i}"] {
+                margin-right: map-get($grid-col-portions, $i );
+            }
+        }
+    }
+}
+
+/**
+* Classes
+*
+*/
+[#{$grid-attribute-name}~="#{$grid-name}"],
+[#{$grid-attribute-name}*="#{$grid-name}-"],
+[#{$grid-attribute-name}*="#{$grid-name}_"] {
+    box-sizing: border-box;
+    display: flex;
+    flex-flow: row wrap;
+    margin: 0 (-$grid-half-gutter-width);
+}
+
+//Cols
+[#{$grid-attribute-name}~="#{$grid-col-name}"],
+[#{$grid-attribute-name}*="#{$grid-col-name}-"],
+[#{$grid-attribute-name}*="#{$grid-col-name}_"] {
+    box-sizing: border-box;
+    padding: 0 $grid-half-gutter-width $grid-gutter-vertical;
+    max-width: 100%;
+}
+
+//Just "COL" & "COL_"
+[#{$grid-attribute-name}~="#{$grid-col-name}"],
+[#{$grid-attribute-name}*="#{$grid-col-name}_"] {
+    flex: 1 1 0;
+}
+
+//Just COL-
+[#{$grid-attribute-name}*="#{$grid-col-name}-"] {
+    flex: none;
+}
+
+//Col & Grid
+[#{$grid-attribute-name}~="#{$grid-name}"][#{$grid-attribute-name}~="#{$grid-col-name}"],
+[#{$grid-attribute-name}~="#{$grid-name}"][#{$grid-attribute-name}*="#{$grid-col-name}-"],
+[#{$grid-attribute-name}~="#{$grid-name}"][#{$grid-attribute-name}*="#{$grid-col-name}_"],
+[#{$grid-attribute-name}*="#{$grid-name}-"][#{$grid-attribute-name}~="#{$grid-col-name}"],
+[#{$grid-attribute-name}*="#{$grid-name}-"][#{$grid-attribute-name}*="#{$grid-col-name}-"],
+[#{$grid-attribute-name}*="#{$grid-name}-"][#{$grid-attribute-name}*="#{$grid-col-name}_"],
+[#{$grid-attribute-name}*="#{$grid-name}_"][#{$grid-attribute-name}~="#{$grid-col-name}"],
+[#{$grid-attribute-name}*="#{$grid-name}_"][#{$grid-attribute-name}*="#{$grid-col-name}-"],
+[#{$grid-attribute-name}*="#{$grid-name}_"][#{$grid-attribute-name}*="#{$grid-col-name}_"] {
+    margin: 0;
+    padding: 0;
+}
+
+/**
+* Helper Suffixes
+*/
+
+//For Grid
+[#{$grid-attribute-name}*="#{$grid-name}-"]{
+    //No Gutters
+    &[#{$grid-attribute-name}*="-no-gutter"]{
+        margin: 0;
+        >[#{$grid-attribute-name}~="#{$grid-col-name}"],
+        >[#{$grid-attribute-name}*="#{$grid-col-name}-"] {
+           padding: 0; 
+        }
+    }
+
+//No Wrapping
+&[#{$grid-attribute-name}*="-no-wrap"] {
+    flex-wrap: nowrap;
+}
+
+//Horizontal Alignment on center
+&[#{$grid-attribute-name}*="-center"] {
+    justify-content: center;
+}
+
+//Horizontal Alignment on right
+&[#{$grid-attribute-name}*="-right"] {
+    justify-content: flex-end;
+    align-self: flex-end;
+    margin-left: auto;
+}
+
+//Vertical Alignment top
+&[#{$grid-attribute-name}*="-top"] {
+    align-items: flex-start;
+}
+
+//Vertical Alignment middle
+&[#{$grid-attribute-name}*="-middle"] {
+    align-items: center;
+}
+
+//Vertical Alignment bottom
+&[#{$grid-attribute-name}*="-bottom"] {
+    align-items: flex-end;
+}
+
+//Orders
+&[#{$grid-attribute-name}*=-reverse]{
+    flex-direction: row-reverse;
+}
+
+&[#{$grid-attribute-name}*="-column"] {
+    flex-direction: column;
+    >[#{$grid-attribute-name}*="#{$grid-col-name}-"]{
+        flex-basis: auto;
+    }
+}
+&[#{$grid-attribute-name}*="-column-reverse"] {
+    flex-direction: column-reverse;
+}
+
+//Spaces Between and Around Columns
+&[#{$grid-attribute-name}*="-space-between"] {
+    justify-content: space-between;
+}
+
+&[#{$grid-attribute-name}*="-space-around"] {
+    justify-content: space-around;
+}
+
+//Equal Height Columns
+&[#{$grid-attribute-name}*="-no-bottom"] > [#{$grid-attribute-name}~="#{$grid-col-name}"],
+&[#{$grid-attribute-name}*="-no-bottom"] > [#{$grid-attribute-name}*="#{$grid-col-name}-"],
+&[#{$grid-attribute-name}*="-no-bottom"] > [#{$grid-attribute-name}*="#{$grid-col-name}_"] {
+    align-self: stretch;
+    > *{
+        height: 100%;
+    }
+}
+
+//No padding bottom
+&[#{$grid-attribute-name}*="-no-bottom"] > [#{$grid-attribute-name}~="#{$grid-col-name}"],
+&[#{$grid-attribute-name}*="-no-bottom"] > [#{$grid-attribute-name}*="#{$grid-col-name}-"],
+&[#{$grid-attribute-name}*="-no-bottom"] > [#{$grid-attribute-name}*="#{$grid-col-name}_"] {
+    padding-bottom:0;
+}
+
+}
 
 
+//For Columns
+[#{$grid-attribute-name}*="#{$grid-col-name}-"]{
+    &[#{$grid-attribute-name}*="-top"]{
+        align-self: flex-start;
+    }
+    &[#{$grid-attribute-name}*="-middle"]{
+        align-self: center;
+    }
+    &[#{$grid-attribute-name}*="-bottom"]{
+        align-self: flex-end;
+    }
+    &[#{$grid-attribute-name}*="-first"]{
+        order: -1;
+    }
+    &[#{$grid-attribute-name}*="-last"]{
+        order: 1;
+    }
+}
 
+/**
+* Grid by number
+*/
+@include makeGridByNumber(#{$grid-name});
+@each $mq-key, $mq-value in $grid-mq-list{
+    @include bp(#{mq-key}){
+        @include makeGridByNumber(_#{$mq-key});
+    }
+}
 
+/**
+* Col Sizes
+*/
 
+@include makeCol(#{$grid-col-name});
+@include makeOffSet(off);
 
+@each $mq-key, $mq-value in $grid-mq-list{
+    @include bp(#{mq-key}){
+        @include makeCol(_#{$mq-key});
+        @include makeOffSet(_#{$mq-key});
+    }
+}
 
+/**
+* Hiding Cols
+*/
+@each $mq-key, $mq-value in $grid-mq-list{
+    @include bp(#{mq-key}){
+        [#{$grid-attribute-name}*="#{$mq-key}-hidden"]{
+            display: none;
+        }
+    }
+}
